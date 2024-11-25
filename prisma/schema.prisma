@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Article {
+  id            String    @id @default(cuid())
+  title         String
+  slug          String    @unique
+  content       String
+  excerpt       String
+  publishedDate DateTime
+  isFeatured    Boolean   @default(false)
+  authorId      String
+  categoryId    String
+  author        Author    @relation(fields: [authorId], references: [id])
+  category      Category  @relation(fields: [categoryId], references: [id])
+  comments      Comment[]
+}
+
+model Author {
+  id          String    @id @default(cuid())
+  name        String
+  bio         String
+  twitterLink String?
+  linkedinLink String?
+  articles    Article[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String
+  slug     String    @unique
+  articles Article[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  articleId String
+  userId    String
+  article   Article  @relation(fields: [articleId], references: [id])
+}

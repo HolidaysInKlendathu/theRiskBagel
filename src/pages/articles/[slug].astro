@@ -1,0 +1,75 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ShareButtons from '../../components/ShareButtons.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Comments from '../../components/Comments.astro';
+import { prisma } from '../../lib/prisma';
+
+export async function getStaticPaths() {
+  const articles = await prisma.article.findMany({
+    include: {
+      author: true,
+      category: true,
+    },
+  });
+
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+const breadcrumbs = [
+  {
+    label: 'Categories',
+    href: '/categories',
+  },
+  {
+    label: article.category.name,
+    href: `/categories/${article.category.slug}`,
+  },
+  {
+    label: article.title,
+    href: `/articles/${article.slug}`,
+  },
+];
+---
+
+<Layout 
+  title={article.title}
+  description={article.excerpt}
+>
+  <article class="max-w-3xl mx-auto">
+    <Breadcrumbs items={breadcrumbs} />
+    
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-4">{article.title}</h1>
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-4">
+          <a href={`/authors/${article.author.id}`} class="text-primary hover:text-primary-dark">
+            {article.author.name}
+          </a>
+          <span class="text-gray-500 dark:text-gray-400">
+            {new Date(article.publishedDate).toLocaleDateString()}
+          </span>
+        </div>
+        <ShareButtons url={canonicalURL.toString()} title={article.title} />
+      </div>
+      <a 
+        href={`/categories/${article.category.slug}`}
+        class="inline-block bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        {article.category.name}
+      </a>
+    </header>
+
+    <div class="prose dark:prose-invert max-w-none mb-12">
+      {article.content}
+    </div>
+
+    <Comments articleId={article.id} />
+  </article>
+</Layout>

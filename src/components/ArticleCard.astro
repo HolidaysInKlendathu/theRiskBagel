@@ -1,0 +1,32 @@
+---
+interface Props {
+  article: {
+    title: string;
+    slug: string;
+    excerpt: string;
+    publishedDate: Date;
+    author: {
+      name: string;
+    };
+  };
+  featured?: boolean;
+}
+
+const { article, featured = false } = Astro.props;
+---
+
+<article class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+  <div class="p-6">
+    <a href={`/articles/${article.slug}`}>
+      <h2 class={`${featured ? 'text-2xl' : 'text-xl'} font-semibold mb-2 hover:text-primary`}>
+        {article.title}
+      </h2>
+    </a>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">{article.excerpt}</p>
+    <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+      <span>{article.author.name}</span>
+      <span class="mx-2">·</span>
+      <span>{new Date(article.publishedDate).toLocaleDateString()}</span>
+    </div>
+  </div>
+</article>

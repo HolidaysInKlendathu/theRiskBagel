@@ -1,0 +1,57 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { prisma } from '../../lib/prisma';
+
+export async function getStaticPaths() {
+  const categories = await prisma.category.findMany({
+    include: {
+      articles: {
+        include: {
+          author: true,
+          category: true,
+        },
+        orderBy: {
+          publishedDate: 'desc',
+        },
+      },
+    },
+  });
+
+  return categories.map((category) => ({
+    params: { slug: category.slug },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+
+const breadcrumbs = [
+  {
+    label: 'Categories',
+    href: '/categories',
+  },
+  {
+    label: category.name,
+    href: `/categories/${category.slug}`,
+  },
+];
+---
+
+<Layout 
+  title={`${category.name} - Insurance Industry News`}
+  description={`Latest news and articles about ${category.name.toLowerCase()} in the insurance industry`}
+>
+  <div class="max-w-4xl mx-auto">
+    <Breadcrumbs items={breadcrumbs} />
+    
+    <h1 class="text-4xl font-bold mb-8">{category.name}</h1>
+    
+    <div class="grid gap-6">
+      {category.articles.map((article) => (
+        <ArticleCard article={article} />
+      ))}
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,49 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import AuthButtons from '../components/AuthButtons.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <ViewTransitions />
+  </head>
+  <body class="min-h-screen bg-white dark:bg-gray-900">
+    <header class="border-b border-gray-200 dark:border-gray-800">
+      <nav class="container mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <a href="/" class="text-2xl font-bold text-primary">InsuranceNews</a>
+          <div class="flex items-center space-x-6">
+            <a href="/categories" class="text-gray-600 dark:text-gray-300 hover:text-primary">Categories</a>
+            <a href="/authors" class="text-gray-600 dark:text-gray-300 hover:text-primary">Authors</a>
+            <AuthButtons />
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="container mx-auto px-4 py-8">
+      <slot />
+    </main>
+    <footer class="border-t border-gray-200 dark:border-gray-800">
+      <div class="container mx-auto px-4 py-6">
+        <p class="text-center text-gray-600 dark:text-gray-400">
+          © {new Date().getFullYear()} InsuranceNews. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

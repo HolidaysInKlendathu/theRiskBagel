@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { prisma } from '../lib/prisma';
+
+const featuredArticles = await prisma.article.findMany({
+  where: { isFeatured: true },
+  include: {
+    author: true,
+    category: true,
+  },
+  take: 3,
+});
+
+const latestArticles = await prisma.article.findMany({
+  where: { isFeatured: false },
+  include: {
+    author: true,
+    category: true,
+  },
+  orderBy: { publishedDate: 'desc' },
+  take: 6,
+});
+---
+
+<Layout 
+  title="Insurance Industry News - Latest Updates and Insights"
+  description="Stay informed with the latest insurance industry news, trends, and expert analysis."
+>
+  <section class="mb-12">
+    <h1 class="text-4xl font-bold mb-8">Featured Stories</h1>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {featuredArticles.map(article => (
+        <article class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+          <div class="p-6">
+            <a href={`/articles/${article.slug}`}>
+              <h2 class="text-xl font-semibold mb-2 hover:text-primary">{article.title}</h2>
+            </a>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">{article.excerpt}</p>
+            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <span>{article.author.name}</span>
+              <span class="mx-2">·</span>
+              <span>{new Date(article.publishedDate).toLocaleDateString()}</span>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section>
+    <h2 class="text-3xl font-bold mb-8">Latest Articles</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {latestArticles.map(article => (
+        <article class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+          <div class="p-6">
+            <a href={`/articles/${article.slug}`}>
+              <h3 class="text-xl font-semibold mb-2 hover:text-primary">{article.title}</h3>
+            </a>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">{article.excerpt}</p>
+            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+              <span>{article.author.name}</span>
+              <span class="mx-2">·</span>
+              <span>{new Date(article.publishedDate).toLocaleDateString()}</span>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</Layout>
